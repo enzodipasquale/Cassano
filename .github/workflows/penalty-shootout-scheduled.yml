@@ -3,7 +3,6 @@ name: Cassano Penalty Player (Scheduled)
 on:
   schedule:
     - cron: '*/10 * * * *'
-  workflow_dispatch:
 
 jobs:
   play-game:
@@ -23,9 +22,7 @@ jobs:
 
     - name: Run Cassano strategy
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
-      run: |
-        echo "⚽ Scheduled Cassano penalty turn"
-        python strategy.py
+      run: python strategy.py
 
