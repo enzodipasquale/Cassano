@@ -9,7 +9,7 @@ import requests
 PLAYER_NAME = "cassano"
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-PLAYER_ID = os.getenv("PLAYER_ID")
+PLAYER_ID = "cassano"
 
 if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
