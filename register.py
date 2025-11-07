@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+import os
+import sys
+
+import requests
+
+
+def main() -> None:
+    server_url = os.getenv("SERVER_URL", "").strip()
+    github_token = os.getenv("GITHUB_TOKEN", "").strip()
+
+    if not server_url:
+        raise SystemExit("SERVER_URL environment variable not set")
+    if not github_token:
+        raise SystemExit("GITHUB_TOKEN environment variable not set")
+
+    try:
+        response = requests.post(
+            f"{server_url.rstrip('/')}/register",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {github_token}",
+            },
+            json={"player_name": "cassano"},
+            timeout=10,
+        )
+    except Exception as exc:
+        raise SystemExit(f"Registration error: {exc}") from exc
+
+    if not response.ok:
+        raise SystemExit(f"Registration failed: {response.status_code} {response.text}")
+
+
+if __name__ == "__main__":
+    main()
+
