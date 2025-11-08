@@ -6,17 +6,15 @@ import requests
 
 
 def main() -> None:
-    server_url = os.getenv("SERVER_URL", "").strip()
+    server_url = os.getenv("SERVER_URL", "https://SERVER_URL_PLACEHOLDER").rstrip("/")
     github_token = os.getenv("GITHUB_TOKEN", "").strip()
 
-    if not server_url:
-        raise SystemExit("SERVER_URL environment variable not set")
     if not github_token:
         raise SystemExit("GITHUB_TOKEN environment variable not set")
 
     try:
         response = requests.post(
-            f"{server_url.rstrip('/')}/register",
+            f"{server_url}/register",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {github_token}",
@@ -38,13 +36,12 @@ def main() -> None:
 
     status = payload.get("status", "").lower()
     if status == "registered":
-        print(f"Player '{payload.get('player_name')}' registered with id {payload.get('player_id')}.")
+        print(f"Player '{payload.get('player_name')}' registered with id {payload.get('player_id') }.")
     elif status == "already_registered":
-        print(f"Player '{payload.get('player_name')}' already registered. Using id {payload.get('player_id')}.")
+        print(f"Player '{payload.get('player_name')}' already registered. Using id {payload.get('player_id') }.")
     else:
         print(f"Registration response: {payload}")
 
 
 if __name__ == "__main__":
     main()
-
