@@ -12,7 +12,7 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
-    player_map = state.get("playerNames") or {}
+    player_map = state.get("playerMap") or {}
     self_id = player_map.get(PLAYER_NAME)
     opponents = [pid for name, pid in player_map.items() if name != PLAYER_NAME]
 
@@ -35,6 +35,7 @@ def main() -> None:
     status = requests.get(
         f"{SERVER_URL}/status",
         headers={"Authorization": f"Bearer {GITHUB_TOKEN}"},
+        params={"player_name": PLAYER_NAME},
         timeout=10,
     )
     status.raise_for_status()
