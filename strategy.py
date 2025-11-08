@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import random
-from typing import Any, Dict
+from typing import Dict, List
 
 import requests
 
@@ -14,22 +14,32 @@ if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
 
 
-def strategy(state: Dict[str, Any]) -> str:
-    return random.choice(["0", "1", "2"])
+def random_sequence(length: int) -> str:
+    return "".join(random.choice("012") for _ in range(length))
+
+
+def extract_players(state: Dict) -> List[str]:
+    game_state = state.get("gameState") or state.get("state") or {}
+    if isinstance(game_state, dict):
+        return list(game_state.keys())
+    if isinstance(game_state, list):
+        return [player.get("player_id") or player.get("player_name") for player in game_state]
+    return []
 
 
 def main() -> None:
-    response = requests.get(f"{SERVER_URL}/status", timeout=10)
-    response.raise_for_status()
-    state = response.json()
+    status_response = requests.get(f"{SERVER_URL}/status", timeout=10)
+    status_response.raise_for_status()
+    status = status_response.json()
 
-    action = strategy(state)
+    players = extract_players(status)
+    sequence = random_sequence(len(players) or 1)
 
     headers = {"Content-Type": "application/json"}
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
-    payload = {"action": action}
+    payload = {"action": sequence}
     if PLAYER_NAME:
         payload["player_name"] = PLAYER_NAME
 
@@ -39,12 +49,7 @@ def main() -> None:
         json=payload,
         timeout=10,
     )
-    try:
-        submission.raise_for_status()
-    except requests.HTTPError:
-        detail = submission.text or submission.reason
-        print(f"Submission failed: {submission.status_code} {detail}")
-        return
+    submission.raise_for_status()
 
 
 if __name__ == "__main__":
