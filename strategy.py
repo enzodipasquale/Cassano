@@ -6,10 +6,9 @@ from typing import Any, Dict
 import requests
 
 
-PLAYER_NAME = "cassano"
+PLAYER_NAME = os.getenv("PLAYER_NAME", "cassano")
 SERVER_URL = os.getenv("SERVER_URL")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-PLAYER_ID = "cassano"
 
 if not SERVER_URL:
     raise SystemExit("SERVER_URL env var required")
@@ -31,8 +30,8 @@ def main() -> None:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
     payload = {"action": action}
-    if PLAYER_ID:
-        payload["player_id"] = PLAYER_ID
+    if PLAYER_NAME:
+        payload["player_name"] = PLAYER_NAME
 
     submission = requests.post(
         f"{SERVER_URL}/action",
