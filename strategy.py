@@ -25,6 +25,34 @@ def strategy(state: Dict[str, Any]) -> Dict[str, Dict[str, int]]:
     }
 
 
+def _resolve_opponents(state: Dict[str, Any], player_name: str) -> List[str]:
+    participants: set[str] = set()
+
+    for name in state.get("playerNames") or []:
+        if name:
+            participants.add(str(name))
+
+    for round_entry in state.get("state") or []:
+        if not isinstance(round_entry, dict):
+            continue
+        for shooter, actions in round_entry.items():
+            if shooter:
+                participants.add(str(shooter))
+            if isinstance(actions, dict):
+                for role in ("shoot", "keep"):
+                    for opponent in (actions.get(role) or {}).keys():
+                        if opponent:
+                            participants.add(str(opponent))
+
+    if not participants:
+        raise SystemExit("No players present in game state; cannot submit action.")
+
+    if player_name not in participants:
+        raise SystemExit(f"Could not find player '{player_name}' in /status response.")
+
+    return sorted(pid for pid in participants if pid != player_name)
+
+
 def main() -> None:
     if not SERVER_URL:
         raise SystemExit("SERVER_URL env var required")
@@ -53,31 +81,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-def _resolve_opponents(state: Dict[str, Any], player_name: str) -> List[str]:
-    participants: set[str] = set()
-
-    for name in state.get("playerNames") or []:
-        if name:
-            participants.add(str(name))
-
-    for round_entry in state.get("state") or []:
-        if not isinstance(round_entry, dict):
-            continue
-        for shooter, actions in round_entry.items():
-            if shooter:
-                participants.add(str(shooter))
-            if isinstance(actions, dict):
-                for role in ("shoot", "keep"):
-                    for opponent in (actions.get(role) or {}).keys():
-                        if opponent:
-                            participants.add(str(opponent))
-
-    if not participants:
-        raise SystemExit("No players present in game state; cannot submit action.")
-
-    if player_name not in participants:
-        raise SystemExit(f"Could not find player '{player_name}' in /status response.")
-
-    return sorted(pid for pid in participants if pid != player_name)
