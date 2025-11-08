@@ -1,8 +1,6 @@
 name: Register Player
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -26,5 +24,3 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GAME_TOKEN }}
         SERVER_URL: ${{ secrets.SERVER_URL }}
       run: python register.py
-
-
